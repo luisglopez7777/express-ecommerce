@@ -8,8 +8,8 @@ const productsService = new ProductsService()
 router.get('/', async function (req, res, next) {
     const { tags } = req.query
     try {
-        const products = productsService.getProducts({ tags })
-        res.render('products', { products })
+        const products = await productsService.getProducts({ tags })
+        res.render("products", { products });
     } catch (err) {
         next(err)
     }
