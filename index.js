@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const boom = require('@hapi/boom')
 const productsRouter = require('./routes/views/products')
 const productsApiRouter = require('./routes/api/products')
+const authApiRouter = require('./routes/api/auth')
 
 const {
     logErrors,
@@ -30,6 +31,7 @@ app.set('view engine', 'pug')
 //Routes
 app.use('/products', productsRouter)
 app.use('/api/products', productsApiRouter)
+app.use('/api/auth', authApiRouter)
 
 //Redirect
 app.get('/', function (req, res) {

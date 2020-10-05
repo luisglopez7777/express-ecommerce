@@ -1,10 +1,14 @@
 const express = require('express')
+const passport = require('passport')
 const router = express.Router()
 const ProductsService = require('../../services/products')
 const { productIdSchema, productTagSchema, createProductSchema,
     updateProductSchema } = require('../../utils/schemas/products')
 
 const validation = require('../../utils/middlewares/validationHandler')
+
+//JWT Strategy
+require('../../utils/auth/strategies/jwt')
 
 const productsService = new ProductsService()
 
@@ -48,33 +52,39 @@ router.post('/', validation(createProductSchema), async function (req, res, next
     }
 })
 
-router.put('/:productId', validation({ productId: productIdSchema }, "params"), validation(updateProductSchema), async function (req, res, next) {
-    const { productId } = req.params
-    const { body: product } = req
-    try {
-        const updatedProduct = await productsService.updateProduct({ productId, product })
+router.put('/:productId',
+    passport.authenticate('jwt', { session: false }),
+    validation({ productId: productIdSchema }, "params"),
+    validation(updateProductSchema),
+    async function (req, res, next) {
+        const { productId } = req.params
+        const { body: product } = req
+        try {
+            const updatedProduct = await productsService.updateProduct({ productId, product })
 
-        res.status(200).json({
-            data: updatedProduct,
-            message: 'products updated'
-        })
-    } catch (err) {
-        next(err)
-    }
-})
+            res.status(200).json({
+                data: updatedProduct,
+                message: 'products updated'
+            })
+        } catch (err) {
+            next(err)
+        }
+    })
 
-router.delete('/:productId', async function (req, res, next) {
-    const { productId } = req.params
-    try {
-        const product = await productsService.deleteProduct({ productId })
+router.delete('/:productId',
+    passport.authenticate('jwt', { session: false }),
+    async function (req, res, next) {
+        const { productId } = req.params
+        try {
+            const product = await productsService.deleteProduct({ productId })
 
-        res.status(200).json({
-            data: product,
-            message: 'products deleted'
-        })
-    } catch (err) {
-        next(err)
-    }
-})
+            res.status(200).json({
+                data: product,
+                message: 'products deleted'
+            })
+        } catch (err) {
+            next(err)
+        }
+    })
 
 module.exports = router
