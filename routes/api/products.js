@@ -9,6 +9,9 @@ const validation = require('../../utils/middlewares/validationHandler')
 //JWT Strategy
 require('../../utils/auth/strategies/jwt')
 
+const cacheResponse = require('../../utils/cacheResponse')
+const { FIVE_MINUTES_IN_SECONDS, SIXTY_MINUTES_IN_SECONDS } = require('../../utils/time')
+
 
 function productsApi(app) {
     const router = express.Router()
@@ -17,6 +20,7 @@ function productsApi(app) {
     const productsService = new ProductsService()
 
     router.get('/', async function (req, res, next) {
+        cacheResponse(res, FIVE_MINUTES_IN_SECONDS)
         const { tags } = req.query
         try {
             const products = await productsService.getProducts({ tags })
@@ -30,6 +34,7 @@ function productsApi(app) {
     })
 
     router.get('/:productId', async function (req, res, next) {
+        cacheResponse(res, SIXTY_MINUTES_IN_SECONDS)
         const { productId } = req.params
         try {
             const product = await productsService.getProduct({ productId })
